@@ -86,6 +86,7 @@ public class SpeechToTextPlugin extends Plugin {
             recognizerIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
             recognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
             recognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "en-US");
+            recognizerIntent.putExtra(RecognizerIntent.EXTRA_PREFER_OFFLINE, true);
         } catch (Exception e) {
             onError(e.getMessage());
         }
@@ -137,8 +138,17 @@ public class SpeechToTextPlugin extends Plugin {
 
     @PluginMethod
     public void stopListening(PluginCall call) {
-        speechRecognizer.stopListening();
-        call.resolve();
+        if (speechRecognizer == null) {
+            call.reject("SpeechRecognizer is null - cannot stop listening.");
+            return;
+        }
+
+        try {
+            speechRecognizer.stopListening();
+            call.resolve();
+        } catch (Exception e) {
+            call.reject("Error stopping listening: " + e.getMessage());
+        }
     }
 
     @PluginMethod
@@ -198,39 +208,6 @@ public class SpeechToTextPlugin extends Plugin {
 
     // @Override
     public void onError(String error) {
-        // String errorMessage;
-        // switch (error) {
-        // case SpeechRecognizer.ERROR_AUDIO:
-        // errorMessage = "Audio recording error";
-        // break;
-        // case SpeechRecognizer.ERROR_CLIENT:
-        // errorMessage = "Client side error";
-        // break;
-        // case SpeechRecognizer.ERROR_INSUFFICIENT_PERMISSIONS:
-        // errorMessage = "Insufficient permissions";
-        // break;
-        // case SpeechRecognizer.ERROR_NETWORK:
-        // errorMessage = "Network error";
-        // break;
-        // case SpeechRecognizer.ERROR_NETWORK_TIMEOUT:
-        // errorMessage = "Network timeout";
-        // break;
-        // case SpeechRecognizer.ERROR_NO_MATCH:
-        // errorMessage = "No match";
-        // break;
-        // case SpeechRecognizer.ERROR_RECOGNIZER_BUSY:
-        // errorMessage = "RecognitionService busy";
-        // break;
-        // case SpeechRecognizer.ERROR_SERVER:
-        // errorMessage = "Server error";
-        // break;
-        // case SpeechRecognizer.ERROR_SPEECH_TIMEOUT:
-        // errorMessage = "No speech input";
-        // break;
-        // default:
-        // errorMessage = "Unknown error";
-        // break;
-        // }
         notifyListeners("onError", new JSObject().put("error", error));
     }
 }
