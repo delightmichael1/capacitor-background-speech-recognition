@@ -1,6 +1,6 @@
 {
   "name": "@deldev/speech-to-text",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A capacitor plugin for speech to text",
   "main": "dist/plugin.cjs.js",
   "module": "dist/esm/index.js",
